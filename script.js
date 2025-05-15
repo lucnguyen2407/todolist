@@ -25,7 +25,58 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('error-message').style.display = 'none';
         }
     });
+    
+    // Initialize filter buttons
+    initFilterButtons();
 });
+
+// Initialize filter buttons
+function initFilterButtons() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Apply the filter
+            const filterType = this.getAttribute('data-filter');
+            filterTasks(filterType);
+        });
+    });
+}
+
+// Filter tasks based on the selected filter
+function filterTasks(filterType) {
+    const tasks = document.querySelectorAll('#todo-list li');
+    
+    tasks.forEach(task => {
+        const checkbox = task.querySelector('input[type="checkbox"]');
+        
+        switch(filterType) {
+            case 'all':
+                task.classList.remove('hidden');
+                break;
+            case 'active':
+                if (checkbox.checked) {
+                    task.classList.add('hidden');
+                } else {
+                    task.classList.remove('hidden');
+                }
+                break;
+            case 'completed':
+                if (checkbox.checked) {
+                    task.classList.remove('hidden');
+                } else {
+                    task.classList.add('hidden');
+                }
+                break;
+        }
+    });
+}
 
 // Validate input and add task if valid
 function validateAndAddTask() {
@@ -223,6 +274,11 @@ function initializeExistingTasks() {
                 label.style.textDecoration = 'none';
                 label.style.color = '';
             }
+            
+            // Reapply current filter when checkbox state changes
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            filterTasks(activeFilter);
+            
             saveTasks();
         });
     });
