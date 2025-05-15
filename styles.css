@@ -65,13 +65,18 @@ li {
     margin-bottom: 10px;
     justify-content: space-between;
     position: relative;
-    padding-left: 30px;
+    background-color: #9f9fed;
+    border-radius: 6px;
+    padding: 10px 10px 10px 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    transition: all 0.2s ease;
 }
 
 li::before {
     content: attr(data-index);
     position: absolute;
-    left: 0;
+    left: 10px;
     width: 22px;
     height: 22px;
     background-color: #4CAF50;
@@ -121,4 +126,17 @@ button.save-btn {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+/* Drag and drop visual styles */
+li.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: scale(0.95);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+li.drag-over {
+    border: 2px dashed #4CAF50;
+    padding: 8px 8px 8px 38px;
 }

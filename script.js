@@ -25,6 +25,67 @@ function updateItemNumbers() {
     });
 }
 
+// Initialize drag and drop for a list item
+function initDragAndDrop(li) {
+    li.setAttribute('draggable', 'true');
+    
+    li.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+        this.classList.add('dragging');
+        
+        // Store the dragged element
+        window.draggedItem = this;
+    });
+    
+    li.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        window.draggedItem = null;
+        
+        // Save the new order
+        saveTasks();
+    });
+    
+    li.addEventListener('dragover', function(e) {
+        e.preventDefault(); // Allow drop
+    });
+    
+    li.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        if (this !== window.draggedItem) {
+            this.classList.add('drag-over');
+        }
+    });
+    
+    li.addEventListener('dragleave', function() {
+        this.classList.remove('drag-over');
+    });
+    
+    li.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        if (this !== window.draggedItem) {
+            const todoList = document.getElementById('todo-list');
+            const items = Array.from(todoList.querySelectorAll('li'));
+            const draggedIndex = items.indexOf(window.draggedItem);
+            const dropIndex = items.indexOf(this);
+            
+            if (draggedIndex > dropIndex) {
+                todoList.insertBefore(window.draggedItem, this);
+            } else {
+                todoList.insertBefore(window.draggedItem, this.nextSibling);
+            }
+        }
+    });
+}
+
+// Initialize drag and drop for all list items
+function initAllDragAndDrop() {
+    document.querySelectorAll('#todo-list li').forEach(li => {
+        initDragAndDrop(li);
+    });
+}
+
 // Load tasks from localStorage
 function loadTasks() {
     const tasks = JSON.parse(localStorage.getItem('todoTasks')) || [];
@@ -66,6 +127,9 @@ function loadTasks() {
         li.appendChild(deleteBtn);
 
         todoList.appendChild(li);
+        
+        // Initialize drag and drop for this item
+        initDragAndDrop(li);
     });
     
     // Update item numbers
@@ -125,6 +189,9 @@ function initializeExistingTasks() {
             saveTasks();
         });
     });
+    
+    // Initialize drag and drop for all items
+    initAllDragAndDrop();
 }
 
 // Function to add a new task
@@ -175,6 +242,9 @@ function addNewTask() {
         li.appendChild(deleteBtn);
 
         document.getElementById("todo-list").appendChild(li);
+        
+        // Initialize drag and drop for this item
+        initDragAndDrop(li);
         
         // Save tasks after adding a new one
         saveTasks();
