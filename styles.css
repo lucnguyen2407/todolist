@@ -128,6 +128,28 @@ button.save-btn {
     border-radius: 4px;
 }
 
+/* Error message styling */
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+    display: none;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+input.error {
+    border-color: #e74c3c;
+    background-color: #fff0f0;
+}
+
 /* Drag and drop visual styles */
 li.dragging {
     opacity: 0.5;

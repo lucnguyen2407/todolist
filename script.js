@@ -7,15 +7,52 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeExistingTasks();
     
     // Add event listener for the add button
-    document.getElementById("add-btn").addEventListener("click", addNewTask);
+    document.getElementById("add-btn").addEventListener("click", function() {
+        validateAndAddTask();
+    });
     
     // Add event listener for the Enter key in the input field
     document.getElementById("todo-input").addEventListener("keypress", function(e) {
         if (e.key === "Enter") {
-            addNewTask();
+            validateAndAddTask();
+        }
+    });
+    
+    // Add event listener to remove error when user starts typing
+    document.getElementById("todo-input").addEventListener("input", function() {
+        if (this.value.trim() !== '') {
+            this.classList.remove('error');
+            document.getElementById('error-message').style.display = 'none';
         }
     });
 });
+
+// Validate input and add task if valid
+function validateAndAddTask() {
+    const input = document.getElementById("todo-input");
+    const errorMessage = document.getElementById("error-message");
+    const taskText = input.value.trim();
+    
+    if (taskText === '') {
+        // Show error message
+        input.classList.add('error');
+        errorMessage.style.display = 'block';
+        
+        // Shake effect by removing and adding the animation
+        errorMessage.style.animation = 'none';
+        setTimeout(() => {
+            errorMessage.style.animation = 'shake 0.5s';
+        }, 10);
+        
+        return false;
+    } else {
+        // Hide error and add the task
+        input.classList.remove('error');
+        errorMessage.style.display = 'none';
+        addNewTask(taskText);
+        return true;
+    }
+}
 
 // Update the item numbers for all tasks
 function updateItemNumbers() {
@@ -110,7 +147,7 @@ function loadTasks() {
         // Apply completed styling if needed
         if (task.completed) {
             label.style.textDecoration = 'line-through';
-            label.style.color = '#999';
+            label.style.color = '#aaa';
         }
 
         const editBtn = document.createElement("button");
@@ -181,7 +218,7 @@ function initializeExistingTasks() {
             const label = this.nextElementSibling;
             if (this.checked) {
                 label.style.textDecoration = 'line-through';
-                label.style.color = '#999';
+                label.style.color = '#aaa';
             } else {
                 label.style.textDecoration = 'none';
                 label.style.color = '';
@@ -195,62 +232,66 @@ function initializeExistingTasks() {
 }
 
 // Function to add a new task
-function addNewTask() {
-    const input = document.getElementById("todo-input");
-    const taskText = input.value.trim();
-    if (taskText) {
-        const li = document.createElement("li");
-        const taskId = `task-${Date.now()}`;
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = taskId;
-        checkbox.addEventListener('change', function() {
-            const label = this.nextElementSibling;
-            if (this.checked) {
-                label.style.textDecoration = 'line-through';
-                label.style.color = '#999';
-            } else {
-                label.style.textDecoration = 'none';
-                label.style.color = '';
-            }
-            saveTasks();
-        });
-
-        const label = document.createElement("label");
-        label.setAttribute("for", taskId);
-        label.textContent = taskText;
-
-        const editBtn = document.createElement("button");
-        editBtn.classList.add("edit-btn");
-        editBtn.textContent = "✏️";
-        editBtn.addEventListener("click", function() {
-            editTask(li);
-        });
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("delete-btn");
-        deleteBtn.textContent = "🗑️";
-        deleteBtn.addEventListener("click", function() {
-            li.remove();
-            saveTasks();
-        });
-
-        li.appendChild(checkbox);
-        li.appendChild(label);
-        li.appendChild(editBtn);
-        li.appendChild(deleteBtn);
-
-        document.getElementById("todo-list").appendChild(li);
-        
-        // Initialize drag and drop for this item
-        initDragAndDrop(li);
-        
-        // Save tasks after adding a new one
-        saveTasks();
-
-        input.value = ""; // Clear the input field after adding task
+function addNewTask(taskText) {
+    // If taskText is not provided, get it from the input field
+    if (!taskText) {
+        const input = document.getElementById("todo-input");
+        taskText = input.value.trim();
+        if (!taskText) return; // Extra check, should not happen due to validation
     }
+    
+    const li = document.createElement("li");
+    const taskId = `task-${Date.now()}`;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = taskId;
+    checkbox.addEventListener('change', function() {
+        const label = this.nextElementSibling;
+        if (this.checked) {
+            label.style.textDecoration = 'line-through';
+            label.style.color = '#aaa';
+        } else {
+            label.style.textDecoration = 'none';
+            label.style.color = '';
+        }
+        saveTasks();
+    });
+
+    const label = document.createElement("label");
+    label.setAttribute("for", taskId);
+    label.textContent = taskText;
+
+    const editBtn = document.createElement("button");
+    editBtn.classList.add("edit-btn");
+    editBtn.textContent = "✏️";
+    editBtn.addEventListener("click", function() {
+        editTask(li);
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("delete-btn");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.addEventListener("click", function() {
+        li.remove();
+        saveTasks();
+    });
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+    li.appendChild(editBtn);
+    li.appendChild(deleteBtn);
+
+    document.getElementById("todo-list").appendChild(li);
+    
+    // Initialize drag and drop for this item
+    initDragAndDrop(li);
+    
+    // Save tasks after adding a new one
+    saveTasks();
+
+    // Clear the input field after adding task
+    document.getElementById("todo-input").value = "";
 }
 
 // Function to edit a task
